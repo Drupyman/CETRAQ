@@ -21,8 +21,7 @@ import {
 import { CheckCircle, Loader, MessageSquare, Heart, Clock, Calendar, Download, AlertTriangle, XCircle, PhoneCall, FileText, TrendingUp, ChevronLeft, ChevronRight, ChevronDown, Lock, Unlock, Trash2 } from 'lucide-react';
 
 // =========================================================================
-// !!! CAMBIO SOLICITADO: Uso de Variables de Entorno para Producción !!!
-// =========================================================================
+// !!! CONFIGURACIÓN DE FIREBASE (MÉTODO "PRO" CON VARIABLES DE ENTORNO) !!!
 // Se asume que estas variables se configurarán en Vercel/Netlify con el prefijo REACT_APP_.
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -33,12 +32,8 @@ const firebaseConfig = {
     appId: process.env.REACT_APP_FIREBASE_APP_ID // Este es el appId usado en las rutas de Firestore
 };
 
-// Reemplazamos las variables globales antiguas con las de entorno o un fallback
 const appId = firebaseConfig.appId || 'default-app-id';
-// El token inicial para autenticación con CustomToken (si lo necesitas)
 const initialAuthToken = process.env.REACT_APP_INITIAL_AUTH_TOKEN || null; 
-// =========================================================================
-// !!! FIN DEL CAMBIO !!!
 // =========================================================================
 
 // Definición de las 8 metas diarias fijas (se reinician todos los días)
@@ -72,7 +67,6 @@ let db;
 let auth;
 
 try {
-  // Ahora comprueba si la configuración clave (apiKey) está presente antes de inicializar
   if (firebaseConfig.apiKey && Object.keys(firebaseConfig).length > 0) {
     app = initializeApp(firebaseConfig);
     db = getFirestore(app);
@@ -350,6 +344,7 @@ const App = () => {
 
 
   // Función para calcular la racha
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const calculateStreak = useCallback((fetchedHistory) => {
     if (fetchedHistory.length === 0) return 0;
     
@@ -404,9 +399,8 @@ const App = () => {
 
   // 1. Inicialización y Autenticación de Firebase
   useEffect(() => {
-    // Si Firebase no se inicializó correctamente (ej. faltan claves), salimos y mostramos error.
     if (!auth || !db) {
-      setError("Firebase no inicializado. Asegúrate de configurar las variables de entorno (REACT_APP_FIREBASE_...).");
+      setError("Firebase no inicializado. Revisa la configuración.");
       setLoading(false);
       return;
     }
@@ -951,7 +945,7 @@ const App = () => {
       <div className="p-8 text-center bg-red-100 border border-red-400 text-red-700 rounded-lg mx-auto max-w-lg mt-10">
         <p className="font-bold">Error Crítico</p>
         <p>{error}</p>
-        <p className="mt-2 text-sm">Por favor, verifica la configuración de Firebase y las reglas de seguridad. **(Si ves este error, asegúrate de que tus variables de entorno estén configuradas en Vercel/Netlify)**</p>
+        <p className="mt-2 text-sm">Por favor, verifica la configuración de Firebase y las reglas de seguridad.</p>
       </div>
     );
   }
